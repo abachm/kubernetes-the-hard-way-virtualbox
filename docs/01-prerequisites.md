@@ -7,7 +7,7 @@
 
 ## Virtual Box
 
-Download and Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads) on any one of the supported platforms:
+Download and Install [VirtualBox](https://www.oracle.com/virtualization/technologies/vm/downloads/virtualbox-downloads.html) on any one of the supported platforms:
 
  - Windows hosts
  - OS X hosts (x86 only, not M1)
@@ -19,7 +19,7 @@ Download and Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads) on 
 Once VirtualBox is installed you may chose to deploy virtual machines manually on it.
 Vagrant provides an easier way to deploy multiple virtual machines on VirtualBox more consistently.
 
-Download and Install [Vagrant](https://www.vagrantup.com/) on your platform.
+Download and Install [Vagrant](https://developer.hashicorp.com/vagrant/downloads?product_intent=vagrant) on your platform.
 
 - Windows
 - Debian
