@@ -11,3 +11,4 @@ temp
 *.kubeconfig
 quick-steps
 venv
+ssh-config

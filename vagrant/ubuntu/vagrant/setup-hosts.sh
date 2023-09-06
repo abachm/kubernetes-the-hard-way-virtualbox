@@ -18,5 +18,6 @@ ${NETWORK}.11  master-1
 ${NETWORK}.12  master-2
 ${NETWORK}.21  worker-1
 ${NETWORK}.22  worker-2
+${NETWORK}.23  worker-3
 ${NETWORK}.30  loadbalancer
 EOF

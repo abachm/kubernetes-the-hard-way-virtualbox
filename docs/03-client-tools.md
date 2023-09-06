@@ -2,41 +2,36 @@
 
 First identify a system from where you will perform administrative tasks, such as creating certificates, kubeconfig files and distributing them to the different VMs.
 
-If you are on a Linux laptop, then your laptop could be this system. In my case I chose the `master-1` node to perform administrative tasks. Whichever system you chose make sure that system is able to access all the provisioned VMs through SSH to copy files over.
+My local system is a linux box, so I will be using this host for these administrative tasks.
 
 ## Access all VMs
 
-Here we create an SSH key pair for the `vagrant` user who we are logged in as. We will copy the public key of this pair to the other master and both workers to permit us to use password-less SSH (and SCP) go get from `master-1` to these other nodes in the context of the `vagrant` user which exists on all nodes.
+As part of the vagrant provision process ssh-keys are generated for
+the vagrant user on the VMs. We can use vagrant to ssh to a single VM,
+but we will be using other secure shell operations. Therefor we will
+extract the vagrant config into a ssh config file which can be used
+for all commands.
 
-Generate Key Pair on `master-1` node
-
-```bash
-ssh-keygen
-```
-
-Leave all settings to default.
-
-View the generated public key ID at:
+Using Vagrant to ssh to a VM. (This can only be done from the vagrant folder.)
 
 ```bash
-cat ~/.ssh/id_rsa.pub
+vagrant ssh <host>
 ```
 
-Add this key to the local authorized_keys (`master-1`) as in some commands we scp to ourself
+Generate a ssh-config file for the setup (in the top level of the repo).
 
 ```bash
-cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+rm -f ssh-config
+pushd vagrant
+for H in master-1 master-2 loadbalancer worker-1 worker-2 worker-3; do vagrant ssh-config $H >> ../ssh-config; done
+popd
 ```
 
-Copy the output into a notepad and form it into the following command
+Test using the new config to ssh to the `master-1` VM.
 
 ```bash
-cat >> ~/.ssh/authorized_keys <<EOF
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD...OUTPUT-FROM-ABOVE-COMMAND...8+08b vagrant@master-1
-EOF
+ssh -F ssh-config master-1
 ```
-
-Now ssh to each of the other nodes and paste the above from your notepad at each command prompt.
 
 ## Install kubectl
 
@@ -47,14 +42,14 @@ Reference: [https://kubernetes.io/docs/tasks/tools/install-kubectl/](https://kub
 ### Linux
 
 ```bash
-wget https://storage.googleapis.com/kubernetes-release/release/v1.24.3/bin/linux/amd64/kubectl
+wget https://storage.googleapis.com/kubernetes-release/release/v1.28.1/bin/linux/amd64/kubectl
 chmod +x kubectl
 sudo mv kubectl /usr/local/bin/
 ```
 
 ### Verification
 
-Verify `kubectl` version 1.24.3 or higher is installed:
+Verify `kubectl` version 1.28.1 or higher is installed:
 
 ```
 kubectl version -o yaml
@@ -63,18 +58,17 @@ kubectl version -o yaml
 > output
 
 ```
-kubectl version -o yaml
 clientVersion:
-  buildDate: "2022-07-13T14:30:46Z"
+  buildDate: "2023-08-24T11:23:10Z"
   compiler: gc
-  gitCommit: aef86a93758dc3cb2c658dd9657ab4ad4afc21cb
+  gitCommit: 8dc49c4b984b897d423aab4971090e1879eb4f23
   gitTreeState: clean
-  gitVersion: v1.24.3
-  goVersion: go1.18.3
+  gitVersion: v1.28.1
+  goVersion: go1.20.7
   major: "1"
-  minor: "24"
+  minor: "28"
   platform: linux/amd64
-kustomizeVersion: v4.5.4
+kustomizeVersion: v5.0.4-0.20230601165947-6ce0bf390ce3
 
 The connection to the server localhost:8080 was refused - did you specify the right host or port?
 ```
