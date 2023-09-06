@@ -9,6 +9,8 @@ temp
 *.csr
 *csr.json
 *.kubeconfig
+*.cnf
+*.srl
 quick-steps
 venv
 ssh-config

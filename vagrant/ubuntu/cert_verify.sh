@@ -489,11 +489,6 @@ case $value in
     check_cert_adminkubeconfig
     check_kubeconfig_exists "kube-controller-manager" $HOME
     check_kubeconfig_exists "kube-scheduler" $HOME
-
-    if [ "${HOST}" = "master-1" ]
-    then
-        check_kubeconfig_exists "kube-proxy" $HOME
-    fi
     ;;
 
   3)
@@ -536,6 +531,7 @@ case $value in
     check_cert_only "ca" $SUBJ_CA $CERT_ISSUER
     check_cert_and_key "kube-proxy" $SUBJ_KP $CERT_ISSUER
     check_cert_and_key "worker-1" "Subject:CN=system:node:worker-1,O=system:nodes" $CERT_ISSUER
+    check_kubeconfig_exists "kube-proxy" $HOME
     check_kubeconfig "kube-proxy" "/var/lib/kube-proxy" "https://${LOADBALANCER}:6443"
     check_kubeconfig "kubelet" "/var/lib/kubelet" "https://${LOADBALANCER}:6443"
     ;;
@@ -553,6 +549,7 @@ case $value in
 
     CERT_LOCATION=/var/lib/kubelet/pki
     check_cert_only "kubelet-client-current" "Subject:O=system:nodes,CN=system:node:worker-2" $CERT_ISSUER
+    check_kubeconfig_exists "kube-proxy" $HOME
     check_kubeconfig "kube-proxy" "/var/lib/kube-proxy" "https://${LOADBALANCER}:6443"
     ;;
 
@@ -569,6 +566,7 @@ case $value in
 
     CERT_LOCATION=/var/lib/kubelet/pki
     check_cert_only "kubelet-client-current" "Subject:O=system:nodes,CN=system:node:worker-3" $CERT_ISSUER
+    check_kubeconfig_exists "kube-proxy" $HOME
     check_kubeconfig "kube-proxy" "/var/lib/kube-proxy" "https://${LOADBALANCER}:6443"
     ;;
 

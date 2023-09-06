@@ -1,8 +1,16 @@
 # Generating Kubernetes Configuration Files for Authentication
 
-In this lab you will generate [Kubernetes configuration files](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/), also known as "kubeconfigs", which enable Kubernetes clients to locate and authenticate to the Kubernetes API Servers.
+In this lab you will generate [Kubernetes configuration
+files](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/),
+also known as "kubeconfigs", which enable Kubernetes clients to locate
+and authenticate to the Kubernetes API Servers.
 
-Note: It is good practice to use file paths to certificates in kubeconfigs that will be used by the services. When certificates are updated, it is not necessary to regenerate the config files, as you would have to if the certificate data was embedded. Note also that the cert files don't exist in these paths yet - we will place them in later labs.
+Note: It is good practice to use file paths to certificates in
+kubeconfigs that will be used by the services. When certificates are
+updated, it is not necessary to regenerate the config files, as you
+would have to if the certificate data was embedded. Note also that the
+cert files don't exist in these paths yet - we will place them in
+later labs.
 
 User configs, like admin.kubeconfig will have the certificate info embedded within them.
 
@@ -12,12 +20,18 @@ In this section you will generate kubeconfig files for the `controller manager`,
 
 ### Kubernetes Public IP Address
 
-Each kubeconfig requires a Kubernetes API Server to connect to. To support high availability the IP address assigned to the load balancer will be used, so let's first get the address of the loadbalancer into a shell variable such that we can use it in the kubeconfigs for services that run on worker nodes. The controller manager and scheduler need to talk to the local API server, hence they use the localhost address.
+Each kubeconfig requires a Kubernetes API Server to connect to. To
+support high availability the IP address assigned to the load balancer
+will be used, so let's first get the address of the loadbalancer into
+a shell variable such that we can use it in the kubeconfigs for
+services that run on worker nodes. The controller manager and
+scheduler need to talk to the local API server, hence they use the
+localhost address.
 
 [//]: # (host:master-1)
 
 ```bash
-LOADBALANCER=$(dig +short loadbalancer)
+LOADBALANCER=$(ssh -F ssh-config master-1 "dig +short loadbalancer")
 ```
 
 ### The kube-proxy Kubernetes Configuration File
@@ -161,8 +175,8 @@ Reference docs for kubeconfig [here](https://kubernetes.io/docs/tasks/access-app
 Copy the appropriate `kube-proxy` kubeconfig files to each worker instance:
 
 ```bash
-for instance in worker-1 worker-2; do
-  scp kube-proxy.kubeconfig ${instance}:~/
+for instance in worker-1 worker-2 worker-3; do
+  scp -F ssh-config kube-proxy.kubeconfig ${instance}:~/
 done
 ```
 
@@ -170,7 +184,7 @@ Copy the appropriate `admin.kubeconfig`, `kube-controller-manager` and `kube-sch
 
 ```bash
 for instance in master-1 master-2; do
-  scp admin.kubeconfig kube-controller-manager.kubeconfig kube-scheduler.kubeconfig ${instance}:~/
+  scp -F ssh-config admin.kubeconfig kube-controller-manager.kubeconfig kube-scheduler.kubeconfig ${instance}:~/
 done
 ```
 
