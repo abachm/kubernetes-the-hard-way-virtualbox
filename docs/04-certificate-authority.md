@@ -1,12 +1,17 @@
 # Provisioning a CA and Generating TLS Certificates
 
-In this lab you will provision a [PKI Infrastructure](https://en.wikipedia.org/wiki/Public_key_infrastructure) using the popular openssl tool, then use it to bootstrap a Certificate Authority, and generate TLS certificates for the following components: etcd, kube-apiserver, kube-controller-manager, kube-scheduler, kubelet, and kube-proxy.
+In this lab you will provision a [PKI
+Infrastructure](https://en.wikipedia.org/wiki/Public_key_infrastructure)
+using the popular openssl tool, then use it to bootstrap a Certificate
+Authority, and generate TLS certificates for the following components:
+etcd, kube-apiserver, kube-controller-manager, kube-scheduler,
+kubelet, and kube-proxy.
 
 # Where to do these?
 
 You can do these on any machine with `openssl` on it. But you should be able to copy the generated files to the provisioned VMs. Or just do these from one of the master nodes.
 
-In our case we do the following steps on the `master-1` node, as we have set it up to be the administrative client.
+In our case we do the following steps on the local linux box, as we have set it up to be the administrative client.
 
 [//]: # (host:master-1)
 
@@ -19,9 +24,9 @@ Query IPs of hosts we will insert as certificate subject alternative names (SANs
 Set up environment variables. Run the following:
 
 ```bash
-MASTER_1=$(dig +short master-1)
-MASTER_2=$(dig +short master-2)
-LOADBALANCER=$(dig +short loadbalancer)
+MASTER_1=$(ssh -F ssh-config master-1 "dig +short master-1")
+MASTER_2=$(ssh -F ssh-config master-1 "dig +short master-2")
+LOADBALANCER=$(ssh -F ssh-config master-1 "dig +short loadbalancer")
 ```
 
 Compute cluster internal API server service address, which is always .1 in the service CIDR range. This is also required as a SAN in the API server certificate. Run the following:
@@ -351,22 +356,6 @@ service-account.key
 service-account.crt
 ```
 
-## Verify the PKI
-
-Run the following, and select option 1 to check all required certificates were generated.
-
-```bash
-./cert_verify.sh
-```
-
-> Expected output
-
-```
-PKI generated correctly!
-```
-
-If there are any errors, please review above steps and then re-verify
-
 ## Distribute the Certificates
 
 Copy the appropriate certificates and private keys to each instance:
@@ -374,22 +363,24 @@ Copy the appropriate certificates and private keys to each instance:
 ```bash
 {
 for instance in master-1 master-2; do
-  scp ca.crt ca.key kube-apiserver.key kube-apiserver.crt \
+  scp -F ssh-config ca.crt ca.key kube-apiserver.key kube-apiserver.crt \
     apiserver-kubelet-client.crt apiserver-kubelet-client.key \
     service-account.key service-account.crt \
     etcd-server.key etcd-server.crt \
     kube-controller-manager.key kube-controller-manager.crt \
     kube-scheduler.key kube-scheduler.crt \
+    admin.key admin.crt \
+    kube-proxy.key kube-proxy.crt \
     ${instance}:~/
 done
 
-for instance in worker-1 worker-2 ; do
-  scp ca.crt kube-proxy.crt kube-proxy.key ${instance}:~/
+for instance in worker-1 worker-2 worker-3 ; do
+  scp -F ssh-config ca.crt kube-proxy.crt kube-proxy.key ${instance}:~/
 done
 }
 ```
 
-## Optional - Check Certificates
+## Check Certificates
 
 At `master-1` and `master-2` nodes, run the following, selecting option 1
 

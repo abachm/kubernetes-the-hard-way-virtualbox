@@ -8,10 +8,10 @@ Download this github repository and cd into the vagrant folder
 git clone https://github.com/abachm/kubernetes-the-hard-way-virtualbox.git
 ```
 
-CD into vagrant directory
+Change directory into vagrant directory
 
 ```bash
-cd kubernetes-the-hard-way-virtualbox\vagrant
+cd kubernetes-the-hard-way-virtualbox/vagrant
 ```
 
 Run Vagrant up

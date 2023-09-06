@@ -25,20 +25,20 @@ The target audience for this tutorial is someone planning to support a productio
 
 Kubernetes The Hard Way guides you through bootstrapping a highly available Kubernetes cluster with end-to-end encryption between components and RBAC authentication.
 
-* [Kubernetes](https://github.com/kubernetes/kubernetes) 1.24.3
-* [Container Runtime](https://github.com/containerd/containerd) 1.5.9
-* [CNI Container Networking](https://github.com/containernetworking/cni) 0.8.6
+* [Kubernetes](https://github.com/kubernetes/kubernetes) 1.28.1
+* [Container Runtime](https://github.com/containerd/containerd) 1.7.5
+* [CNI Container Networking](https://github.com/containernetworking/cni) 1.1.2
 * [Weave Networking](https://www.weave.works/docs/net/latest/kubernetes/kube-addon/)
-* [etcd](https://github.com/coreos/etcd) v3.5.3
-* [CoreDNS](https://github.com/coredns/coredns) v1.9.4
+* [etcd](https://github.com/coreos/etcd) v3.5.9
+* [CoreDNS](https://github.com/coredns/coredns) v1.11.1
 
 ### Node configuration
 
 We will be building the following:
 
 * Two control plane nodes (`master-1` and `master-2`) running the control plane components as operating system services.
-* Two worker nodes (`worker-1` and `worker-2`)
-* One loadbalancer VM running HAProxy to balance requests between the two API servers.
+* Three worker nodes (`worker-1`, `worker-2`, and `worker-3`)
+* One loadbalancer (`loadbalancer`) VM running Envoy to balance requests between the two API servers.
 
 ## Labs
 
