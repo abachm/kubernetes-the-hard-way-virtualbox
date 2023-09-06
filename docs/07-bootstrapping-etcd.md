@@ -1,6 +1,9 @@
 # Bootstrapping the etcd Cluster
 
-Kubernetes components are stateless and store cluster state in [etcd](https://etcd.io/). In this lab you will bootstrap a two node etcd cluster and configure it for high availability and secure remote access.
+Kubernetes components are stateless and store cluster state in
+[etcd](https://etcd.io/). In this lab you will bootstrap a two node
+etcd cluster and configure it for high availability and secure remote
+access.
 
 ## Prerequisites
 
@@ -21,15 +24,15 @@ Download the official etcd release binaries from the [etcd](https://github.com/e
 
 ```bash
 wget -q --show-progress --https-only --timestamping \
-  "https://github.com/coreos/etcd/releases/download/v3.5.3/etcd-v3.5.3-linux-amd64.tar.gz"
+  "https://github.com/etcd-io/etcd/releases/download/v3.5.9/etcd-v3.5.9-linux-amd64.tar.gz"
 ```
 
 Extract and install the `etcd` server and the `etcdctl` command line utility:
 
 ```bash
 {
-  tar -xvf etcd-v3.5.3-linux-amd64.tar.gz
-  sudo mv etcd-v3.5.3-linux-amd64/etcd* /usr/local/bin/
+  tar zxfv etcd-v3.5.9-linux-amd64.tar.gz
+  sudo mv etcd-v3.5.9-linux-amd64/etcd* /usr/local/bin/
 }
 ```
 
@@ -129,8 +132,8 @@ sudo ETCDCTL_API=3 etcdctl member list \
 > output
 
 ```
-45bf9ccad8d8900a, started, master-2, https://192.168.56.12:2380, https://192.168.56.12:2379
-54a5796a6803f252, started, master-1, https://192.168.56.11:2380, https://192.168.56.11:2379
+1761bef04e125165, started, master-1, https://192.168.56.11:2380, https://192.168.56.11:2379, false
+d60f170a453bcaf4, started, master-2, https://192.168.56.12:2380, https://192.168.56.12:2379, false
 ```
 
 Reference: https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/#starting-etcd-clusters
