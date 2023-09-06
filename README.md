@@ -38,7 +38,7 @@ We will be building the following:
 
 * Two control plane nodes (`master-1` and `master-2`) running the control plane components as operating system services.
 * Three worker nodes (`worker-1`, `worker-2`, and `worker-3`)
-* One loadbalancer (`loadbalancer`) VM running Envoy to balance requests between the two API servers.
+* One loadbalancer (`loadbalancer`) VM running HAproxy to balance requests between the two API servers.
 
 ## Labs
 

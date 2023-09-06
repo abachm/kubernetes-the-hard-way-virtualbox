@@ -1,12 +1,24 @@
 # Bootstrapping the Kubernetes Control Plane
 
-In this lab you will bootstrap the Kubernetes control plane across 2 compute instances and configure it for high availability. You will also create an external load balancer that exposes the Kubernetes API Servers to remote clients. The following components will be installed on each node: Kubernetes API Server, Scheduler, and Controller Manager.
+In this lab you will bootstrap the Kubernetes control plane across 2
+compute instances and configure it for high availability. You will
+also create an external load balancer that exposes the Kubernetes API
+Servers to remote clients. The following components will be installed
+on each node: Kubernetes API Server, Scheduler, and Controller
+Manager.
 
-Note that in a production-ready cluster it is recommended to have an odd number of master nodes as for multi-node services like etcd, leader election and quorum work better. See lecture on this ([KodeKloud](https://kodekloud.com/topic/etcd-in-ha/), [Udemy](https://www.udemy.com/course/certified-kubernetes-administrator-with-practice-tests/learn/lecture/14296192#overview)). We're only using two here to save on RAM on your workstation.
+Note that in a production-ready cluster it is recommended to have an
+odd number of master nodes as for multi-node services like etcd,
+leader election and quorum work better. See lecture on this
+([KodeKloud](https://kodekloud.com/topic/etcd-in-ha/),
+[Udemy](https://www.udemy.com/course/certified-kubernetes-administrator-with-practice-tests/learn/lecture/14296192#overview)). We're
+only using two here to save on RAM on your workstation.
 
 ## Prerequisites
 
-The commands in this lab up as far as the load balancer configuration must be run on each controller instance: `master-1`, and `master-2`. Login to each controller instance using SSH Terminal.
+The commands in this lab up as far as the load balancer configuration
+must be run on each controller instance: `master-1`, and
+`master-2`. Login to each controller instance using SSH Terminal.
 
 You can perform this step with [tmux](01-prerequisites.md#running-commands-in-parallel-with-tmux)
 
@@ -20,10 +32,10 @@ Download the official Kubernetes release binaries:
 
 ```bash
 wget -q --show-progress --https-only --timestamping \
-  "https://storage.googleapis.com/kubernetes-release/release/v1.24.3/bin/linux/amd64/kube-apiserver" \
-  "https://storage.googleapis.com/kubernetes-release/release/v1.24.3/bin/linux/amd64/kube-controller-manager" \
-  "https://storage.googleapis.com/kubernetes-release/release/v1.24.3/bin/linux/amd64/kube-scheduler" \
-  "https://storage.googleapis.com/kubernetes-release/release/v1.24.3/bin/linux/amd64/kubectl"
+  "https://storage.googleapis.com/kubernetes-release/release/v1.28.1/bin/linux/amd64/kube-apiserver" \
+  "https://storage.googleapis.com/kubernetes-release/release/v1.28.1/bin/linux/amd64/kube-controller-manager" \
+  "https://storage.googleapis.com/kubernetes-release/release/v1.28.1/bin/linux/amd64/kube-scheduler" \
+  "https://storage.googleapis.com/kubernetes-release/release/v1.28.1/bin/linux/amd64/kubectl"
 ```
 
 Reference: https://kubernetes.io/releases/download/#binaries
@@ -56,7 +68,9 @@ Place the key pairs into the kubernetes data directory and secure
 }
 ```
 
-The instance internal IP address will be used to advertise the API Server to members of the cluster. The load balancer IP address will be used as the external endpoint to the API servers.<br>
+The instance internal IP address will be used to advertise the API
+Server to members of the cluster. The load balancer IP address will be
+used as the external endpoint to the API servers.<br>
 Retrieve these internal IP addresses:
 
 ```bash
@@ -242,23 +256,28 @@ It will give you a deprecation warning here, but that's ok.
 
 ```
 Warning: v1 ComponentStatus is deprecated in v1.19+
-NAME                 STATUS    MESSAGE              ERROR
-controller-manager   Healthy   ok
+NAME                 STATUS    MESSAGE   ERROR
 scheduler            Healthy   ok
-etcd-0               Healthy   {"health": "true"}
-etcd-1               Healthy   {"health": "true"}
+controller-manager   Healthy   ok
+etcd-0               Healthy   ok
 ```
 
 > Remember to run the above commands on each controller node: `master-1`, and `master-2`.
 
 ## The Kubernetes Frontend Load Balancer
 
-In this section you will provision an external load balancer to front the Kubernetes API Servers. The `kubernetes-the-hard-way` static IP address will be attached to the resulting load balancer.
+In this section you will provision an external load balancer to front
+the Kubernetes API Servers. The `kubernetes-the-hard-way` static IP
+address will be attached to the resulting load balancer.
 
 
 ### Provision a Network Load Balancer
 
-A NLB operates at [layer 4](https://en.wikipedia.org/wiki/OSI_model#Layer_4:_Transport_layer) (TCP) meaning it passes the traffic straight through to the back end servers unfettered and does not interfere with the TLS process, leaving this to the Kube API servers.
+A NLB operates at [layer
+4](https://en.wikipedia.org/wiki/OSI_model#Layer_4:_Transport_layer)
+(TCP) meaning it passes the traffic straight through to the back end
+servers unfettered and does not interfere with the TLS process,
+leaving this to the Kube API servers.
 
 Login to `loadbalancer` instance using SSH Terminal.
 
@@ -315,12 +334,12 @@ curl  https://${LOADBALANCER}:6443/version -k
 ```
 {
   "major": "1",
-  "minor": "24",
-  "gitVersion": "v1.24.3",
-  "gitCommit": "aef86a93758dc3cb2c658dd9657ab4ad4afc21cb",
+  "minor": "28",
+  "gitVersion": "v1.28.1",
+  "gitCommit": "8dc49c4b984b897d423aab4971090e1879eb4f23",
   "gitTreeState": "clean",
-  "buildDate": "2022-07-13T14:23:26Z",
-  "goVersion": "go1.18.3",
+  "buildDate": "2023-08-24T11:16:30Z",
+  "goVersion": "go1.20.7",
   "compiler": "gc",
   "platform": "linux/amd64"
 }

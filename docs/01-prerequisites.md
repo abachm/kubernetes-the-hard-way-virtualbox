@@ -71,12 +71,24 @@ Additionally edit line 164 of [coredns.yaml](../deployments/coredns.yaml) to set
 
 ## Running Commands in Parallel with tmux
 
-[tmux](https://github.com/tmux/tmux/wiki) can be used to run commands on multiple compute instances at the same time. Labs in this tutorial may require running the same commands across multiple compute instances, in those cases consider using tmux and splitting a window into multiple panes with synchronize-panes enabled to speed up the provisioning process.
+[tmux](https://github.com/tmux/tmux/wiki) can be used to run commands
+on multiple compute instances at the same time. Labs in this tutorial
+may require running the same commands across multiple compute
+instances, in those cases consider using tmux and splitting a window
+into multiple panes with synchronize-panes enabled to speed up the
+provisioning process.
 
 > The use of tmux is optional and not required to complete this tutorial.
 
 ![tmux screenshot](images/tmux-screenshot.png)
 
-> Enable synchronize-panes by pressing `CTRL+B` followed by `"` to split the window into two panes. In each pane (selectable with mouse), ssh to the host(s) you will be working with.</br>Next type `CTRL+X` at the prompt to begin sync. In sync mode, the dividing line between panes will be red. Everything you type or paste in one pane will be echoed in the other.<br>To disable synchronization type `CTRL+X` again.</br></br>Note that the `CTRL-X` key binding is provided by a `.tmux.conf` loaded onto the VM by the vagrant provisioner.
+> Enable synchronize-panes by pressing `CTRL+B` followed by `"` to
+> split the window into two panes. Use `CTRL-B ArrowUp/ArrowDown` to
+> navigate between windows. </br>Next type `CTRL+B :` to open command
+> input and enter `setw synchronize-panes` at the prompt to begin
+> sync. In sync mode, the dividing line between panes will be
+> red. Everything you type or paste in one pane will be echoed in the
+> other.<br>To disable synchronization type `CTRL+B :` and type in
+> `setw synchronize-panes` again.</br>
 
 Next: [Compute Resources](02-compute-resources.md)
