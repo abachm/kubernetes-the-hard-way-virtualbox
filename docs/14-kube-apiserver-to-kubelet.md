@@ -1,13 +1,22 @@
 ## RBAC for Kubelet Authorization
 
-In this section you will configure RBAC permissions to allow the Kubernetes API Server to access the Kubelet API on each worker node. Access to the Kubelet API is required for retrieving metrics, logs, and executing commands in pods.
+In this section you will configure RBAC permissions to allow the
+Kubernetes API Server to access the Kubelet API on each worker
+node. Access to the Kubelet API is required for retrieving metrics,
+logs, and executing commands in pods.
 
-> This tutorial sets the Kubelet `--authorization-mode` flag to `Webhook`. Webhook mode uses the [SubjectAccessReview](https://kubernetes.io/docs/admin/authorization/#checking-api-access) API to determine authorization.
+> This tutorial sets the Kubelet `--authorization-mode` flag to
+> `Webhook`. Webhook mode uses the
+> [SubjectAccessReview](https://kubernetes.io/docs/admin/authorization/#checking-api-access)
+> API to determine authorization.
 
 [//]: # (host:master-1)
 
 
-Create the `system:kube-apiserver-to-kubelet` [ClusterRole](https://kubernetes.io/docs/admin/authorization/rbac/#role-and-clusterrole) with permissions to access the Kubelet API and perform most common tasks associated with managing pods:
+Create the `system:kube-apiserver-to-kubelet`
+[ClusterRole](https://kubernetes.io/docs/admin/authorization/rbac/#role-and-clusterrole)
+with permissions to access the Kubelet API and perform most common
+tasks associated with managing pods:
 
 ```bash
 cat <<EOF | kubectl apply --kubeconfig admin.kubeconfig -f -

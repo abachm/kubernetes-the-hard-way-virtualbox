@@ -10,19 +10,18 @@ Each kubeconfig requires a Kubernetes API Server to connect to. To support high 
 
 [//]: # (host:master-1)
 
-On `master-1`
+On my local machine
 
 Get the kube-api server load-balancer IP.
 
 ```bash
-LOADBALANCER=$(dig +short loadbalancer)
+LOADBALANCER=$(ssh -F ssh-config master-1 "dig +short loadbalancer")
 ```
 
 Generate a kubeconfig file suitable for authenticating as the `admin` user:
 
 ```bash
 {
-
   kubectl config set-cluster kubernetes-the-hard-way \
     --certificate-authority=ca.crt \
     --embed-certs=true \
@@ -54,11 +53,10 @@ kubectl get componentstatuses
 
 ```
 Warning: v1 ComponentStatus is deprecated in v1.19+
-NAME                 STATUS    MESSAGE             ERROR
+NAME                 STATUS    MESSAGE   ERROR
 controller-manager   Healthy   ok
 scheduler            Healthy   ok
-etcd-1               Healthy   {"health":"true"}
-etcd-0               Healthy   {"health":"true"}
+etcd-0               Healthy   ok
 ```
 
 List the nodes in the remote Kubernetes cluster:
@@ -70,9 +68,10 @@ kubectl get nodes
 > output
 
 ```
-NAME       STATUS      ROLES    AGE    VERSION
-worker-1   NotReady    <none>   118s   v1.24.3
-worker-2   NotReady    <none>   118s   v1.24.3
+NAME       STATUS     ROLES    AGE   VERSION
+worker-1   NotReady   <none>   17h   v1.28.1
+worker-2   NotReady   <none>   19m   v1.28.1
+worker-3   NotReady   <none>   19m   v1.28.1
 ```
 
 Prev: [TLS Bootstrapping Kubernetes Workers](11-tls-bootstrapping-kubernetes-workers.md)</br>

@@ -7,11 +7,11 @@ We chose to use CNI - [weave](https://www.weave.works/docs/net/latest/kubernetes
 
 ### Deploy Weave Network
 
-Deploy weave network. Run only once on the `master-1` node. You will see a warning, but this is OK.
+Deploy weave network. Run only once on my local host. You will see a warning, but this is OK.
 
 [//]: # (host:master-1)
 
-On `master-1`
+On local linux box
 
 ```bash
 kubectl apply -f "https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s-1.11.yaml"
@@ -32,9 +32,10 @@ kubectl get pods -n kube-system
 > output
 
 ```
-NAME              READY   STATUS    RESTARTS   AGE
-weave-net-58j2j   2/2     Running   0          89s
-weave-net-rr5dk   2/2     Running   0          89s
+NAME              READY   STATUS    RESTARTS      AGE
+weave-net-7ptsp   2/2     Running   1 (74s ago)   81s
+weave-net-b8dvj   2/2     Running   1 (74s ago)   81s
+weave-net-vfwrd   2/2     Running   1 (73s ago)   81s
 ```
 
 Once the Weave pods are fully running which might take up to 60 seconds, the nodes should be ready
@@ -46,9 +47,10 @@ kubectl get nodes
 > Output
 
 ```
-NAME       STATUS   ROLES    AGE     VERSION
-worker-1   Ready    <none>   4m11s   v1.24.3
-worker-2   Ready    <none>   2m49s   v1.24.3
+NAME       STATUS   ROLES    AGE   VERSION
+worker-1   Ready    <none>   18h   v1.28.1
+worker-2   Ready    <none>   33m   v1.28.1
+worker-3   Ready    <none>   33m   v1.28.1
 ```
 
 Reference: https://kubernetes.io/docs/tasks/administer-cluster/network-policy-provider/weave-network-policy/#install-the-weave-net-addon
