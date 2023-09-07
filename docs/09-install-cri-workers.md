@@ -1,24 +1,33 @@
 # Installing CRI on the Kubernetes Worker Nodes
 
-In this lab you will install the Container Runtime Interface (CRI) on both worker nodes. CRI is a standard interface for the management of containers. Since v1.24 the use of dockershim has been fully deprecated and removed from the code base. [containerd replaces docker](https://kodekloud.com/blog/kubernetes-removed-docker-what-happens-now/) as the container runtime for Kubernetes, and it requires support from [CNI Plugins](https://github.com/containernetworking/plugins) to configure container networks, and [runc](https://github.com/opencontainers/runc) to actually do the job of running containers.
+In this lab you will install the Container Runtime Interface (CRI) on
+both worker nodes. CRI is a standard interface for the management of
+containers. Since k8s v1.24 the use of dockershim has been fully
+deprecated and removed from the code base. [containerd replaces
+docker](https://kodekloud.com/blog/kubernetes-removed-docker-what-happens-now/)
+as the container runtime for Kubernetes, and it requires support from
+[CNI Plugins](https://github.com/containernetworking/plugins) to
+configure container networks, and
+[runc](https://github.com/opencontainers/runc) to actually do the job
+of running containers.
 
 Reference: https://github.com/containerd/containerd/blob/main/docs/getting-started.md
 
 ### Download and Install Container Networking
 
-The commands in this lab must be run on each worker instance: `worker-1`, and `worker-2`. Login to each controller instance using SSH Terminal.
+The commands in this lab must be run on each worker instance: `worker-1`, `worker-2`, and `worker-3`. Login to each worker instance using SSH Terminal.
 
-[//]: # (host:worker-1-worker-2)
+[//]: # (host:worker-1-worker-2-worker-3)
 
 You can perform this step with [tmux](01-prerequisites.md#running-commands-in-parallel-with-tmux)
 
-The versions chosen here align with those that are installed by the current `kubernetes-cni` package for a v1.24 cluster.
+The versions chosen here align with those that are installed by the current `kubernetes-cni` package for a v1.28.1 cluster.
 
 ```bash
 {
-  CONTAINERD_VERSION=1.5.9
-  CNI_VERSION=0.8.6
-  RUNC_VERSION=1.1.1
+  CONTAINERD_VERSION=1.7.5
+  CNI_VERSION=1.3.0
+  RUNC_VERSION=1.1.9
 
   wget -q --show-progress --https-only --timestamping \
     https://github.com/containerd/containerd/releases/download/v${CONTAINERD_VERSION}/containerd-${CONTAINERD_VERSION}-linux-amd64.tar.gz \

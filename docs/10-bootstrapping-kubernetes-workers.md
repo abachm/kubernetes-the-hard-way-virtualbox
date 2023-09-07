@@ -1,6 +1,6 @@
 # Bootstrapping the Kubernetes Worker Nodes
 
-In this lab you will bootstrap 2 Kubernetes worker nodes. We already installed `containerd` and its dependencies on these nodes in the previous lab.
+In this lab you will bootstrap 3 Kubernetes worker nodes. We already installed `containerd` and its dependencies on these nodes in the previous lab.
 
 We will now install the kubernetes components
 - [kubelet](https://kubernetes.io/docs/admin/kubelet)
@@ -8,21 +8,29 @@ We will now install the kubernetes components
 
 ## Prerequisites
 
-The Certificates and Configuration are created on `master-1` node and then copied over to workers using `scp`.
+The Certificates and Configuration are created and then copied over to the workers using `scp` in a previous step.
 Once this is done, the commands are to be run on first worker instance: `worker-1`. Login to first worker instance using SSH Terminal.
 
 ### Provisioning Kubelet Client Certificates
 
-Kubernetes uses a [special-purpose authorization mode](https://kubernetes.io/docs/admin/authorization/node/) called Node Authorizer, that specifically authorizes API requests made by [Kubelets](https://kubernetes.io/docs/concepts/overview/components/#kubelet). In order to be authorized by the Node Authorizer, Kubelets must use a credential that identifies them as being in the `system:nodes` group, with a username of `system:node:<nodeName>`. In this section you will create a certificate for each Kubernetes worker node that meets the Node Authorizer requirements.
+Kubernetes uses a [special-purpose authorization
+mode](https://kubernetes.io/docs/admin/authorization/node/) called
+Node Authorizer, that specifically authorizes API requests made by
+[Kubelets](https://kubernetes.io/docs/concepts/overview/components/#kubelet). In
+order to be authorized by the Node Authorizer, Kubelets must use a
+credential that identifies them as being in the `system:nodes` group,
+with a username of `system:node:<nodeName>`. In this section you will
+create a certificate for each Kubernetes worker node that meets the
+Node Authorizer requirements.
 
 Generate a certificate and private key for one worker node:
 
-On `master-1`:
+On the host which has all the other certificates:
 
 [//]: # (host:master-1)
 
 ```bash
-WORKER_1=$(dig +short worker-1)
+WORKER_1=$(ssh -F ssh-config master-1 "dig +short worker-1")
 ```
 
 ```bash
@@ -54,17 +62,19 @@ worker-1.crt
 
 ### The kubelet Kubernetes Configuration File
 
-When generating kubeconfig files for Kubelets the client certificate matching the Kubelet's node name must be used. This will ensure Kubelets are properly authorized by the Kubernetes [Node Authorizer](https://kubernetes.io/docs/admin/authorization/node/).
+When generating kubeconfig files for Kubelets the client certificate
+matching the Kubelet's node name must be used. This will ensure
+Kubelets are properly authorized by the Kubernetes [Node
+Authorizer](https://kubernetes.io/docs/admin/authorization/node/).
 
 Get the kub-api server load-balancer IP.
 
 ```bash
-LOADBALANCER=$(dig +short loadbalancer)
+LOADBALANCER=$(ssh -F ssh-config master-1 "dig +short loadbalancer")
 ```
 
 Generate a kubeconfig file for the first worker node.
 
-On `master-1`:
 ```bash
 {
   kubectl config set-cluster kubernetes-the-hard-way \
@@ -93,10 +103,9 @@ worker-1.kubeconfig
 ```
 
 ### Copy certificates, private keys and kubeconfig files to the worker node:
-On `master-1`:
 
 ```bash
-scp ca.crt worker-1.crt worker-1.key worker-1.kubeconfig worker-1:~/
+scp -F ssh-config ca.crt worker-1.crt worker-1.key worker-1.kubeconfig worker-1:~/
 ```
 
 
@@ -109,9 +118,9 @@ All the following commands from here until the [verification](#verification) ste
 
 ```bash
 wget -q --show-progress --https-only --timestamping \
-  https://storage.googleapis.com/kubernetes-release/release/v1.24.3/bin/linux/amd64/kubectl \
-  https://storage.googleapis.com/kubernetes-release/release/v1.24.3/bin/linux/amd64/kube-proxy \
-  https://storage.googleapis.com/kubernetes-release/release/v1.24.3/bin/linux/amd64/kubelet 
+  https://storage.googleapis.com/kubernetes-release/release/v1.28.1/bin/linux/amd64/kubectl \
+  https://storage.googleapis.com/kubernetes-release/release/v1.28.1/bin/linux/amd64/kube-proxy \
+  https://storage.googleapis.com/kubernetes-release/release/v1.28.1/bin/linux/amd64/kubelet
 ```
 
 Reference: https://kubernetes.io/releases/download/#binaries
@@ -136,7 +145,7 @@ Install the worker binaries:
 ```
 
 ### Configure the Kubelet
-On worker-1:
+On `worker-1`:
 
 Copy keys and config to correct directories and secure
 
@@ -219,7 +228,7 @@ EOF
 ```
 
 ### Configure the Kubernetes Proxy
-On worker-1:
+On `worker-1`:
 
 ```bash
 sudo mv kube-proxy.kubeconfig /var/lib/kube-proxy/
@@ -267,7 +276,7 @@ At `worker-1` node, run the following, selecting option 4
 
 
 ### Start the Worker Services
-On worker-1:
+On `worker-1`:
 ```bash
 {
   sudo systemctl daemon-reload
@@ -294,7 +303,7 @@ kubectl get nodes --kubeconfig admin.kubeconfig
 
 ```
 NAME       STATUS     ROLES    AGE   VERSION
-worker-1   NotReady   <none>   93s   v1.24.3
+worker-1   NotReady   <none>   93s   v1.28.1
 ```
 
 The node is not ready as we have not yet installed pod networking. This comes later.

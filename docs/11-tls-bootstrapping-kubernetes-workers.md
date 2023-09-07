@@ -24,7 +24,11 @@ So let's get started!
 
 # What is required for TLS Bootstrapping
 
-**Certificates API:** The Certificate API (as discussed in the lecture) provides a set of APIs on Kubernetes that can help us manage certificates (Create CSR, Get them signed by CA, Retrieve signed certificate etc). The worker nodes (kubelets) have the ability to use this API to get certificates signed by the Kubernetes CA.
+**Certificates API:** The Certificate API (as discussed in the
+lecture) provides a set of APIs on Kubernetes that can help us manage
+certificates (Create CSR, Get them signed by CA, Retrieve signed
+certificate etc). The worker nodes (kubelets) have the ability to use
+this API to get certificates signed by the Kubernetes CA.
 
 # Pre-Requisite
 
@@ -32,7 +36,9 @@ So let's get started!
 
 `--enable-bootstrap-token-auth=true`
 
-**kube-controller-manager** - The certificate requests are signed by the kube-controller-manager ultimately. The kube-controller-manager requires the CA Certificate and Key to perform these operations.
+**kube-controller-manager** - The certificate requests are signed by
+the kube-controller-manager ultimately. The kube-controller-manager
+requires the CA Certificate and Key to perform these operations.
 
 ```
   --cluster-signing-cert-file=/var/lib/kubernetes/ca.crt \\
@@ -47,9 +53,16 @@ So let's get started!
 
 Run the following steps on `master-1`
 
-For the workers(kubelet) to access the Certificates API, they need to authenticate to the kubernetes api-server first. For this we create a [Bootstrap Token](https://kubernetes.io/docs/reference/access-authn-authz/bootstrap-tokens/) to be used by the kubelet
+For the workers(kubelet) to access the Certificates API, they need to
+authenticate to the kubernetes api-server first. For this we create a
+[Bootstrap
+Token](https://kubernetes.io/docs/reference/access-authn-authz/bootstrap-tokens/)
+to be used by the kubelet
 
-Bootstrap Tokens take the form of a 6 character token id followed by 16 character token secret separated by a dot. Eg: abcdef.0123456789abcdef. More formally, they must match the regular expression [a-z0-9]{6}\.[a-z0-9]{16}
+Bootstrap Tokens take the form of a 6 character token id followed by
+16 character token secret separated by a dot. Eg:
+abcdef.0123456789abcdef. More formally, they must match the regular
+expression [a-z0-9]{6}\.[a-z0-9]{16}
 
 Set an expiration date for the bootstrap token of 7 days from now (you can adjust this)
 
@@ -89,7 +102,6 @@ EOF
 
 
 kubectl create -f bootstrap-token-07401b.yaml --kubeconfig admin.kubeconfig
-
 ```
 
 Things to note:
@@ -129,9 +141,7 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 EOF
 
-
 kubectl create -f csrs-for-bootstrapping.yaml --kubeconfig admin.kubeconfig
-
 ```
 Reference: https://kubernetes.io/docs/reference/access-authn-authz/kubelet-tls-bootstrapping/#authorize-kubelet-to-create-csr
 
@@ -170,7 +180,11 @@ Reference: https://kubernetes.io/docs/reference/access-authn-authz/kubelet-tls-b
 
 ## Step 4 Authorize workers(kubelets) to Auto Renew Certificates on expiration
 
-We now create the Cluster Role Binding required for the nodes to automatically renew the certificates on expiry. Note that we are NOT using the **system:bootstrappers** group here any more. Since by the renewal period, we believe the node would be bootstrapped and part of the cluster already. All nodes are part of the **system:nodes** group.
+We now create the Cluster Role Binding required for the nodes to
+automatically renew the certificates on expiry. Note that we are NOT
+using the **system:bootstrappers** group here any more. Since by the
+renewal period, we believe the node would be bootstrapped and part of
+the cluster already. All nodes are part of the **system:nodes** group.
 
 ```bash
 kubectl create clusterrolebinding auto-approve-renewals-for-nodes \
@@ -206,17 +220,17 @@ Reference: https://kubernetes.io/docs/reference/access-authn-authz/kubelet-tls-b
 
 ## Step 5 Configure the Binaries on the Worker node
 
-Going forward all activities are to be done on the `worker-2` node until [step 11](#step-11-approve-server-csr).
+Going forward all activities are to be done on the `worker-2` and `worker-3` nodes until [step 11](#step-11-approve-server-csr).
 
-[//]: # (host:worker-2)
+[//]: # (host:worker-2-worker-3)
 
 ### Download and Install Worker Binaries
 
 ```bash
 wget -q --show-progress --https-only --timestamping \
-  https://storage.googleapis.com/kubernetes-release/release/v1.24.3/bin/linux/amd64/kubectl \
-  https://storage.googleapis.com/kubernetes-release/release/v1.24.3/bin/linux/amd64/kube-proxy \
-  https://storage.googleapis.com/kubernetes-release/release/v1.24.3/bin/linux/amd64/kubelet
+  https://storage.googleapis.com/kubernetes-release/release/v1.28.1/bin/linux/amd64/kubectl \
+  https://storage.googleapis.com/kubernetes-release/release/v1.28.1/bin/linux/amd64/kube-proxy \
+  https://storage.googleapis.com/kubernetes-release/release/v1.28.1/bin/linux/amd64/kubelet
 ```
 
 Reference: https://kubernetes.io/releases/download/#binaries
@@ -251,12 +265,14 @@ Move the certificates and secure them.
 
 ## Step 6 Configure Kubelet to TLS Bootstrap
 
-It is now time to configure the second worker to TLS bootstrap using the token we generated
+It is now time to configure the second and third workers to TLS bootstrap using the token we generated
 
 For worker-1 we started by creating a kubeconfig file with the TLS certificates that we manually generated.
 Here, we don't have the certificates yet. So we cannot create a kubeconfig file. Instead we create a bootstrap-kubeconfig file with information about the token we created.
 
-This is to be done on the `worker-2` node. Note that now we have set up the load balancer to provide high availibilty across the API servers, we point kubelet to the load balancer.
+This is to be done on the `worker-2` and `worker-3` nodes. Note that
+now we have set up the load balancer to provide high availibilty
+across the API servers, we point kubelet to the load balancer.
 
 Set up some shell variables for nodes and services we will require in the following configurations:
 
@@ -422,7 +438,7 @@ EOF
 
 ## Step 10 Start the Worker Services
 
-On worker-2:
+On `worker-2` and `worker-3`:
 
 ```bash
 {
@@ -431,11 +447,11 @@ On worker-2:
   sudo systemctl start kubelet kube-proxy
 }
 ```
-> Remember to run the above commands on worker node: `worker-2`
+> Remember to run the above commands on worker nodes: `worker-2` and `worker-3`
 
 ### Optional - Check Certificates and kubeconfigs
 
-At `worker-2` node, run the following, selecting option 5
+At `worker-2` and `worker-3` node, run the following, selecting option 5 for `worker-2` and 6 for `worker-3`.
 
 ```bash
 ./cert_verify.sh
@@ -456,15 +472,20 @@ kubectl get csr --kubeconfig admin.kubeconfig
 > Output - Note the name will be different, but it will begin with `csr-`
 
 ```
-NAME        AGE   SIGNERNAME                                    REQUESTOR                 REQUESTEDDURATION   CONDITION
-csr-7k8nh   85s   kubernetes.io/kubelet-serving                 system:node:worker-2      <none>              Pending
-csr-n7z8p   98s   kubernetes.io/kube-apiserver-client-kubelet   system:bootstrap:07401b   <none>              Approved,Issued
+NAME        AGE    SIGNERNAME                                    REQUESTOR                 REQUESTEDDURATION   CONDITION
+csr-8cnhh   116s   kubernetes.io/kubelet-serving                 system:node:worker-2      <none>              Pending
+csr-fwrwn   118s   kubernetes.io/kube-apiserver-client-kubelet   system:bootstrap:07401b   <none>              Approved,Issued
+csr-xmzw4   118s   kubernetes.io/kube-apiserver-client-kubelet   system:bootstrap:07401b   <none>              Approved,Issued
+csr-z88wz   116s   kubernetes.io/kubelet-serving                 system:node:worker-3      <none>              Pending
 ```
 
-Approve the pending certificate. Note that the certificate name `csr-7k8nh` will be different for you, and each time you run through.
+Approve the pending certificates. Note that the certificate name `csr-fwrwn` and `csr-xmzw4` will be different for you, and each time you run through.
 
 ```
-kubectl certificate approve csr-7k8nh --kubeconfig admin.kubeconfig
+{
+  kubectl certificate approve csr-fwrwn --kubeconfig admin.kubeconfig
+  kubectl certificate approve csr-xmzw4 --kubeconfig admin.kubeconfig
+}
 ```
 
 
@@ -483,9 +504,10 @@ kubectl get nodes --kubeconfig admin.kubeconfig
 > output
 
 ```
-NAME       STATUS      ROLES    AGE   VERSION
-worker-1   NotReady    <none>   93s   v1.24.3
-worker-2   NotReady    <none>   93s   v1.24.3
+NAME       STATUS     ROLES    AGE   VERSION
+worker-1   NotReady   <none>   17h   v1.28.1
+worker-2   NotReady   <none>   7m    v1.28.1
+worker-3   NotReady   <none>   7m    v1.28.1
 ```
 
 Prev: [Bootstrapping the Kubernetes Worker Nodes](10-bootstrapping-kubernetes-workers.md)</br>
