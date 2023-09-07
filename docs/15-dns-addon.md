@@ -4,7 +4,7 @@ In this lab you will deploy the [DNS add-on](https://kubernetes.io/docs/concepts
 
 ## The DNS Cluster Add-on
 
-[//]: # (host:master-1)
+[//]: # (host:local-box)
 
 Deploy the `coredns` cluster add-on:
 
@@ -37,8 +37,8 @@ kubectl get pods -l k8s-app=kube-dns -n kube-system
 
 ```
 NAME                       READY   STATUS    RESTARTS   AGE
-coredns-699f8ddd77-94qv9   1/1     Running   0          20s
-coredns-699f8ddd77-gtcgb   1/1     Running   0          20s
+coredns-7c6b96d559-trxhw   1/1     Running   0          25s
+coredns-7c6b96d559-zztfc   1/1     Running   0          25s
 ```
 
 Reference: https://kubernetes.io/docs/tasks/administer-cluster/coredns/#installing-coredns
@@ -48,7 +48,7 @@ Reference: https://kubernetes.io/docs/tasks/administer-cluster/coredns/#installi
 Create a `busybox` pod:
 
 ```bash
-kubectl run busybox --image=busybox:1.28 --command -- sleep 3600
+kubectl run busybox --image=busybox:1.36 --command -- sleep 3600
 ```
 
 [//]: # (command:kubectl wait pods -n default -l run=busybox --for condition=Ready --timeout=90s)
@@ -63,8 +63,8 @@ kubectl get pods -l run=busybox
 > output
 
 ```
-NAME                      READY   STATUS    RESTARTS   AGE
-busybox-bd8fb7cbd-vflm9   1/1     Running   0          10s
+NAME      READY   STATUS    RESTARTS   AGE
+busybox   1/1     Running   0          7s
 ```
 
 Execute a DNS lookup for the `kubernetes` service inside the `busybox` pod:

@@ -4,7 +4,7 @@ In this lab you will complete a series of tasks to ensure your Kubernetes cluste
 
 ## Data Encryption
 
-[//]: # (host:master-1)
+[//]: # (host:local host)
 
 In this section you will verify the ability to [encrypt secret data at rest](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#verifying-that-data-is-encrypted).
 
@@ -75,8 +75,8 @@ kubectl get pods -l app=nginx
 > output
 
 ```
-NAME                    READY   STATUS    RESTARTS   AGE
-nginx-dbddb74b8-6lxg2   1/1     Running   0          10s
+NAME                     READY   STATUS    RESTARTS   AGE
+nginx-795d57dc9d-j284q   1/1     Running   0          8s
 ```
 
 ### Services
@@ -92,13 +92,17 @@ kubectl expose deploy nginx --type=NodePort --port 80
 
 ```bash
 PORT_NUMBER=$(kubectl get svc -l app=nginx -o jsonpath="{.items[0].spec.ports[0].nodePort}")
+WORKER_1=$(ssh -F ssh-config master-1 "dig +short worker-1")
+WORKER_2=$(ssh -F ssh-config master-1 "dig +short worker-2")
+WORKER_3=$(ssh -F ssh-config master-1 "dig +short worker-3")
 ```
 
 Test to view NGINX page
 
 ```bash
-curl http://worker-1:$PORT_NUMBER
-curl http://worker-2:$PORT_NUMBER
+curl http://$WORKER_1:$PORT_NUMBER
+curl http://$WORKER_2:$PORT_NUMBER
+curl http://$WORKER_3:$PORT_NUMBER
 ```
 
 > output
@@ -131,8 +135,11 @@ kubectl logs $POD_NAME
 > output
 
 ```
-10.32.0.1 - - [20/Mar/2019:10:08:30 +0000] "GET / HTTP/1.1" 200 612 "-" "curl/7.58.0" "-"
-10.40.0.0 - - [20/Mar/2019:10:08:55 +0000] "GET / HTTP/1.1" 200 612 "-" "curl/7.58.0" "-"
+2023/09/07 09:17:48 [notice] 1#1: start worker processes
+2023/09/07 09:17:48 [notice] 1#1: start worker process 31
+10.32.0.1 - - [07/Sep/2023:09:20:55 +0000] "GET / HTTP/1.1" 200 615 "-" "curl/7.88.1" "-"
+10.40.0.0 - - [07/Sep/2023:09:20:55 +0000] "GET / HTTP/1.1" 200 615 "-" "curl/7.88.1" "-"
+10.38.0.0 - - [07/Sep/2023:09:20:55 +0000] "GET / HTTP/1.1" 200 615 "-" "curl/7.88.1" "-"
 ```
 
 ### Exec
